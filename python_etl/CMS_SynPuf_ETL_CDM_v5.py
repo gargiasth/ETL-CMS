@@ -238,7 +238,7 @@ def get_timestamp():
 # TODO: use standard python logger...
 # -----------------------------------
 def log_stats(msg):
-    print msg
+    print(msg)
     global current_stats_filename
     with open(current_stats_filename,'a') as fout:
         fout.write('[{0}]{1}\n'.format(get_timestamp(),msg))
@@ -391,7 +391,7 @@ def build_maps():
         fin.readline() #skip header
         for rec in fin:
             recs_in += 1
-            if recs_in % 100000 == 0: print 'omop concept relationship recs=',recs_in
+            if recs_in % 100000 == 0: print('omop concept relationship recs=',recs_in)
             flds = (rec[:-1]).split('\t')
             if len(flds) == OMOP_CONCEPT_RELATIONSHIP_RECORD.fieldCount:
                 concept_id1 = flds[OMOP_CONCEPT_RELATIONSHIP_RECORD.CONCEPT_ID_1]
@@ -400,7 +400,7 @@ def build_maps():
                 invalid_reason = flds[OMOP_CONCEPT_RELATIONSHIP_RECORD.INVALID_REASON]
 
                 if concept_id1 != '' and concept_id2 != '' and relationship_id == "Maps to" and invalid_reason == '':
-                    if concept_relationship_dict.has_key(concept_id1):         # one concept id might have several mapping, so values are stored as list
+                    if (concept_id1 in concept_relationship_dict):         # one concept id might have several mapping, so values are stored as list
                         concept_relationship_dict[concept_id1].append(concept_id2)
                     else:
                         concept_relationship_dict[concept_id1] = [concept_id2]
@@ -432,7 +432,7 @@ def build_maps():
                 concept_id = flds[OMOP_CONCEPT_RECORD.CONCEPT_ID]
                 domain_id = flds[OMOP_CONCEPT_RECORD.DOMAIN_ID]
                 domain_dict[concept_id] = domain_id
-    print "loaded domain dict with this many records: ", len(domain_dict)
+    print("loaded domain dict with this many records: ", len(domain_dict))
 
     with open(omop_concept_file,'r') as fin, \
          open(omop_concept_debug_file, 'w') as fout_log:
@@ -440,7 +440,7 @@ def build_maps():
         fin.readline() #skip header
         for rec in fin:
             recs_in += 1
-            if recs_in % 100000 == 0: print 'omop concept recs=',recs_in
+            if recs_in % 100000 == 0: print('omop concept recs=',recs_in)
             flds = (rec[:-1]).split('\t')
 
             if len(flds) == OMOP_CONCEPT_RECORD.fieldCount:
@@ -462,29 +462,29 @@ def build_maps():
                                          OMOP_CONSTANTS.NDC_VOCABULARY_ID]:
                         recs_checked += 1
 
-                        if  not concept_relationship_dict.has_key(concept_id):
-							if  not domain_destination_file_list.has_key(domain_id):
-								status = "No destination defined for domain " + domain_id + " of concept " + concept_id
-							else:
-								destination_file = domain_destination_file_list[domain_id]
-								if( vocabulary_id == OMOP_CONSTANTS.ICD_9_VOCAB_ID):
-									status = "No map from ICD9 code, or code invalid for " + concept_id
-									recs_skipped += 1
-								if( vocabulary_id == OMOP_CONSTANTS.HCPCS_VOCABULARY_ID):
-									status = "No self map from OMOP (HCPCS/CPT4) to OMOP (HCPCS/CPT4) or code invalid for " + concept_id
-									recs_skipped += 1
-								if( vocabulary_id == OMOP_CONSTANTS.NDC_VOCABULARY_ID):
-									status = "No map from OMOP (NDC) to OMOP (RxNorm) or code invalid for " + concept_id
-									recs_skipped += 1
-								source_code_concept_dict[vocabulary_id,concept_code] = [SourceCodeConcept(concept_code, concept_id, "0", destination_file)]
+                        if  not (concept_id in concept_relationship_dict):
+                            if  not (domain_id in domain_destination_file_list):
+                                status = "No destination defined for domain " + domain_id + " of concept " + concept_id
+                            else:
+                                destination_file = domain_destination_file_list[domain_id]
+                                if( vocabulary_id == OMOP_CONSTANTS.ICD_9_VOCAB_ID):
+                                    status = "No map from ICD9 code, or code invalid for " + concept_id
+                                    recs_skipped += 1
+                                if( vocabulary_id == OMOP_CONSTANTS.HCPCS_VOCABULARY_ID):
+                                    status = "No self map from OMOP (HCPCS/CPT4) to OMOP (HCPCS/CPT4) or code invalid for " + concept_id
+                                    recs_skipped += 1
+                                if( vocabulary_id == OMOP_CONSTANTS.NDC_VOCABULARY_ID):
+                                    status = "No map from OMOP (NDC) to OMOP (RxNorm) or code invalid for " + concept_id
+                                    recs_skipped += 1
+                                source_code_concept_dict[vocabulary_id,concept_code] = [SourceCodeConcept(concept_code, concept_id, "0", destination_file)]
                         else:
                             source_code_concept_dict[vocabulary_id,concept_code] = []
                             for concept in concept_relationship_dict[concept_id]:
-								if  not domain_destination_file_list.has_key(domain_dict[concept]):
-									status = "No destination defined for domain " + domain_dict[concept] + " of concept " + concept_id
-								else:
-									destination_file = domain_destination_file_list[domain_dict[concept]]
-									source_code_concept_dict[vocabulary_id,concept_code].append(SourceCodeConcept(concept_code, concept_id, concept, destination_file))
+                                if  not (domain_dict[concept] in domain_destination_file_list):
+                                    status = "No destination defined for domain " + domain_dict[concept] + " of concept " + concept_id
+                                else:
+                                    destination_file = domain_destination_file_list[domain_dict[concept]]
+                                    source_code_concept_dict[vocabulary_id,concept_code].append(SourceCodeConcept(concept_code, concept_id, concept, destination_file))
 
                 if status != '':
                     fout_log.write(status + ': \t')
@@ -559,7 +559,7 @@ def determine_visits(bene):
         rec = InpatientClaim(raw_rec)
         if rec.CLM_FROM_DT == '':
             continue
-        if not visit_occurrence_ids.has_key((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM)):
+        if not ((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM) in visit_occurrence_ids):
             bene.visit_dates[rec.CLM_FROM_DT] = visit_id
             bene.visit_dates[rec.CLM_THRU_DT] = visit_id
             visit_occurrence_ids[rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM] = visit_id
@@ -570,7 +570,7 @@ def determine_visits(bene):
         rec = OutpatientClaim(raw_rec)
         if rec.CLM_FROM_DT == '':
             continue
-        if not visit_occurrence_ids.has_key((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM)):
+        if not ((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM) in visit_occurrence_ids):
             bene.visit_dates[rec.CLM_FROM_DT] = visit_id
             bene.visit_dates[rec.CLM_THRU_DT] = visit_id
             visit_occurrence_ids[rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.PRVDR_NUM] = visit_id
@@ -581,7 +581,7 @@ def determine_visits(bene):
         rec = CarrierClaim(raw_rec)
         if rec.CLM_FROM_DT == '':
             continue
-        if not visit_occurrence_ids.has_key((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.TAX_NUM)):
+        if not ((rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.TAX_NUM) in visit_occurrence_ids):
             bene.visit_dates[rec.CLM_FROM_DT] = visit_id
             bene.visit_dates[rec.CLM_THRU_DT] = visit_id
             visit_occurrence_ids[rec.DESYNPUF_ID,rec.CLM_FROM_DT,rec.CLM_THRU_DT,rec.TAX_NUM] = visit_id
@@ -654,7 +654,7 @@ def write_payer_plan_period_record(beneficiary):
         return       # dictionary is empty
     else:
         '''
-        for k,v in ppyd.iteritems():
+        for k,v in ppyd.items():
             if k[1] == 'BENE_HI_CVRAGE_TOT_MONS':       #plan A
                 planA[k[0]] = v
             if k[1] == 'BENE_SMI_CVRAGE_TOT_MONS':      #plan B
@@ -666,7 +666,7 @@ def write_payer_plan_period_record(beneficiary):
         '''
         for plan_source_value in plan_source_value_list:
             if plan_source_value == "Medicare Part A":
-                nd = {k[0]:v for k,v in ppyd.iteritems() if k[1] == 'BENE_HI_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
+                nd = {k[0]:v for k,v in ppyd.items() if k[1] == 'BENE_HI_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
                 payer_plan_period_dates = get_payer_plan_period_date_list(nd)
                 for i in range(len(payer_plan_period_dates)):
                     payer_plan_period_start_date = payer_plan_period_dates[i][0]
@@ -674,7 +674,7 @@ def write_payer_plan_period_record(beneficiary):
                     plan_source_value = "Medicare Part A"
                     write_to_payer_plan_period_file(payer_plan_period_fd, beneficiary.person_id, payer_plan_period_start_date, payer_plan_period_end_date, plan_source_value)
             elif plan_source_value == "Medicare Part B":
-                nd = {k[0]:v for k,v in ppyd.iteritems() if k[1] == 'BENE_SMI_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
+                nd = {k[0]:v for k,v in ppyd.items() if k[1] == 'BENE_SMI_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
                 payer_plan_period_dates = get_payer_plan_period_date_list(nd)
                 for i in range(len(payer_plan_period_dates)):
                     payer_plan_period_start_date = payer_plan_period_dates[i][0]
@@ -682,7 +682,7 @@ def write_payer_plan_period_record(beneficiary):
                     plan_source_value = "Medicare Part B"
                     write_to_payer_plan_period_file(payer_plan_period_fd, beneficiary.person_id, payer_plan_period_start_date, payer_plan_period_end_date, plan_source_value)
             elif plan_source_value == "Medicare Part D":
-                nd = {k[0]:v for k,v in ppyd.iteritems() if k[1] == 'PLAN_CVRG_MOS_NUM'}  # new dictionary with year as key and value as val
+                nd = {k[0]:v for k,v in ppyd.items() if k[1] == 'PLAN_CVRG_MOS_NUM'}  # new dictionary with year as key and value as val
                 payer_plan_period_dates = get_payer_plan_period_date_list(nd)
                 for i in range(len(payer_plan_period_dates)):
                     payer_plan_period_start_date = payer_plan_period_dates[i][0]
@@ -690,7 +690,7 @@ def write_payer_plan_period_record(beneficiary):
                     plan_source_value = "Medicare Part D"
                     write_to_payer_plan_period_file(payer_plan_period_fd, beneficiary.person_id, payer_plan_period_start_date, payer_plan_period_end_date, plan_source_value)
             elif plan_source_value == "HMO":
-                nd = {k[0]:v for k,v in ppyd.iteritems() if k[1] == 'BENE_HMO_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
+                nd = {k[0]:v for k,v in ppyd.items() if k[1] == 'BENE_HMO_CVRAGE_TOT_MONS'}  # new dictionary with year as key and value as val
                 payer_plan_period_dates = get_payer_plan_period_date_list(nd)
                 for i in range(len(payer_plan_period_dates)):
                     payer_plan_period_start_date = payer_plan_period_dates[i][0]
@@ -738,7 +738,7 @@ def get_payer_plan_period_date_list(plan):
         date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2009'] > 0:
             payer_plan_period_start_date = '2009-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,01,01), plan['2009'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,1,1), plan['2009'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         payer_plan_period_start_date = '2010-01-01'
         payer_plan_period_end_date = '2010-12-31'
@@ -749,11 +749,11 @@ def get_payer_plan_period_date_list(plan):
         date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2009'] > 0:
             payer_plan_period_start_date = '2009-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,01,01), plan['2009'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,1,1), plan['2009'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2010'] > 0:
             payer_plan_period_start_date = '2010-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2010,01,01), plan['2010'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2010,1,1), plan['2010'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
     elif plan['2008'] < 12 and plan['2009'] == 12 and plan['2010'] == 12:
         if plan['2008'] == 0:
@@ -772,11 +772,11 @@ def get_payer_plan_period_date_list(plan):
     elif plan['2008'] < 12 and plan['2009'] < 12 and plan['2010'] == 12:
         if plan['2008'] > 0:
             payer_plan_period_start_date = '2008-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2008,01,01), plan['2008'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2008,1,1), plan['2008'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2009'] > 0:
             payer_plan_period_start_date = '2009-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,01,01), plan['2009'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,1,1), plan['2009'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         payer_plan_period_start_date = '2010-01-01'
         payer_plan_period_end_date = '2010-12-31'
@@ -784,15 +784,15 @@ def get_payer_plan_period_date_list(plan):
     elif plan['2008'] < 12 and plan['2009'] < 12 and plan['2010'] < 12:
         if plan['2008'] > 0:
             payer_plan_period_start_date = '2008-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2008,01,01), plan['2008'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2008,1,1), plan['2008'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2009'] > 0:
             payer_plan_period_start_date = '2009-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,01,01), plan['2009'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2009,1,1), plan['2009'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
         if plan['2010'] > 0:
             payer_plan_period_start_date = '2010-01-01'
-            payer_plan_period_end_date = get_payer_plan_period_date(date(2010,01,01), plan['2010'])
+            payer_plan_period_end_date = get_payer_plan_period_date(date(2010,1,1), plan['2010'])
             date_list.append((payer_plan_period_start_date, payer_plan_period_end_date))
     return date_list
 
@@ -1826,11 +1826,11 @@ def dump_source_concept_codes():
         def check_carrier_claims():
             global recs_in
             global recs_out
-            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Carrier_Claims_Sample_1AB.csv.srt','rU') as fin:
+            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Carrier_Claims_Sample_1AB.csv.srt','r') as fin:
                 for raw_rec in fin:
                     recs_in += 1
                     if recs_in % 50000 == 0:
-                        print 'carrier-claims, recs_in=', recs_in
+                        print('carrier-claims, recs_in=', recs_in)
 
                     # print '[{0}] {1}'.format(recs_in, rec[:-1])
                     # fout_codes.write('[{0}] {1}\n'.format(recs_in, raw_rec[:-1]))
@@ -1869,12 +1869,12 @@ def dump_source_concept_codes():
         def check_inpatient_claims():
             global recs_in
             global recs_out
-            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.csv','rU') as fin:
+            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Inpatient_Claims_Sample_1.csv','r') as fin:
                 record_type = 'ip'
                 for raw_rec in fin:
                     recs_in += 1
                     if recs_in % 10000 == 0:
-                        print 'inpatient-claims, recs_in=', recs_in
+                        print('inpatient-claims, recs_in=', recs_in)
 
                     # print '[{0}] {1}'.format(recs_in, rec[:-1])
                     # fout_codes.write('[{0}] {1}\n'.format(recs_in, raw_rec[:-1]))
@@ -1909,12 +1909,12 @@ def dump_source_concept_codes():
         def check_outpatient_claims():
             global recs_in
             global recs_out
-            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Outpatient_Claims_Sample_1.csv','rU') as fin:
+            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Outpatient_Claims_Sample_1.csv','r') as fin:
                 record_type = 'op'
                 for raw_rec in fin:
                     recs_in += 1
                     if recs_in % 10000 == 0:
-                        print 'outpatient-claims, recs_in=', recs_in
+                        print('outpatient-claims, recs_in=', recs_in)
 
                     # print '[{0}] {1}'.format(recs_in, rec[:-1])
                     # fout_codes.write('[{0}] {1}\n'.format(recs_in, raw_rec[:-1]))
@@ -1958,12 +1958,12 @@ def dump_source_concept_codes():
         def check_prescription_drug():
             global recs_in
             global recs_out
-            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Prescription_Drug_Events_Sample_1.csv','rU') as fin:
+            with open('/Data/OHDSI/CMS_SynPuf/DE1_1/DE1_0_2008_to_2010_Prescription_Drug_Events_Sample_1.csv','r') as fin:
                 record_type = 'rx'
                 for raw_rec in fin:
                     recs_in += 1
                     if recs_in % 10000 == 0:
-                        print 'prescription-drugs, recs_in=', recs_in
+                        print('prescription-drugs, recs_in=', recs_in)
 
                     # print '[{0}] {1}'.format(recs_in, rec[:-1])
                     # fout_codes.write('[{0}] {1}\n'.format(recs_in, raw_rec[:-1]))
@@ -1994,10 +1994,10 @@ def dump_source_concept_codes():
             for code, recs in dct.items():
                 fout.write("{0},{1},{2}\n".format(label, code, recs))
 
-    print '--done: recs-in=',recs_in,', out=', recs_out
+    print('--done: recs-in=',recs_in,', out=', recs_out)
 
     for type, count in rec_types.items():
-        print type,count
+        print(type,count)
 '''
 #---------------------------------
 # start of the program
@@ -2023,9 +2023,9 @@ if __name__ == '__main__':
     file_control = FileControl(BASE_SYNPUF_INPUT_DIRECTORY, BASE_OUTPUT_DIRECTORY, SYNPUF_DIR_FORMAT, current_sample_number)
     file_control.delete_all_output()
 
-    print '-'*80
-    print '-- all files present....'
-    print '-'*80
+    print('-'*80)
+    print('-- all files present....')
+    print('-'*80)
 
     #Set up initial identifier counters
     table_ids = Table_ID_Values()
@@ -2060,7 +2060,7 @@ if __name__ == '__main__':
 
                 for rec in fin:
                     recs_in += 1
-                    if recs_in % 10000 == 0: print 'beneficiary recs_in: ', recs_in
+                    if recs_in % 10000 == 0: print('beneficiary recs_in: ', recs_in)
 
                     rec = rec.split(',')
                     DESYNPUF_ID = rec[BENEFICIARY_SUMMARY_RECORD.DESYNPUF_ID]
@@ -2087,7 +2087,7 @@ if __name__ == '__main__':
                     process_beneficiary(bene)
 
         except BaseException:
-            print '** ERROR reading beneficiary file, record number ', recs_in, '\n record-> ', rec
+            print('** ERROR reading beneficiary file, record number ', recs_in, '\n record-> ', rec)
             raise
 
         beneficiary_fd.increment_recs_read(recs_in)
@@ -2113,4 +2113,4 @@ if __name__ == '__main__':
             log_stats('\tFile: {0:50}, records_written={1:10}'.format(fd.token, fd.records_written))
 
 
-    print '** done **'
+    print('** done **')
