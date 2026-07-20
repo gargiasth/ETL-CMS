@@ -1,6 +1,6 @@
 # This script will merge the 20 csv files for each type into a single csv per type
 # Ported to Python 3.
-#
+# test
 
 import os, dotenv
 dotenv.load_dotenv(".env")
