@@ -1,6 +1,6 @@
 import os, os.path, subprocess
 from constants import SYNPUF_FILE_TOKENS
-
+## Update print statements for Python3.x
 
 # -----------------------------------
 # - Combine 3 beneficiary files into 1, with the year prefixed.
@@ -11,9 +11,9 @@ def combine_beneficiary_files(sample_directory, sample_number, output_bene_filen
     # log_stats('combine_beneficiary_files starting: sample_number=' + str(sample_number))
     # log_stats('Writing to ->' + output_bene_filename)
 
-    print '-'*80
-    print 'combine_beneficiary_files starting: sample_number=' + str(sample_number)
-    print 'Writing to ->' + output_bene_filename
+    print('-'*80)
+    print('combine_beneficiary_files starting: sample_number=' + str(sample_number))
+    print('Writing to ->' + output_bene_filename)
 
     total_recs_in = 0
     total_recs_out = 0
@@ -22,14 +22,14 @@ def combine_beneficiary_files(sample_directory, sample_number, output_bene_filen
         for year in ['2008','2009','2010']:
             input_bene_filename = os.path.join(sample_directory,
                                                'DE1_0_{0}_Beneficiary_Summary_File_Sample_{1}.csv'.format(year, sample_number))
-            print 'Reading    ->' + input_bene_filename
+            print('Reading    ->' + input_bene_filename)
             if not os.path.exists(input_bene_filename):
-                print '.....not found, looking for zip'
+                print('.....not found, looking for zip')
                 zipped_file = input_bene_filename.replace('.csv','.zip')
                 if os.path.exists(zipped_file):
                     subprocess.call(["unzip", "-d", sample_directory, zipped_file])
                 if not os.path.exists(input_bene_filename):
-                    print '** File not found !! ', input_bene_filename
+                    print('** File not found !! ', input_bene_filename)
                     raise Exception()
             recs_in = 0
             with open(input_bene_filename, 'r') as f_in:
@@ -39,13 +39,13 @@ def combine_beneficiary_files(sample_directory, sample_number, output_bene_filen
                 for line in f_in:
                     recs_in += 1
                     if recs_in % 25000 == 0:
-                        print 'Year-{0}: records read ={1}, total written={2}'.format(year, recs_in, total_recs_out)
+                        print('Year-{0}: records read ={1}, total written={2}'.format(year, recs_in, total_recs_out))
                     f_out.write(year + ',' + line)
                     total_recs_out += 1
-            print 'Year-{0}: total records read ={1}'.format(year, recs_in)
+            print('Year-{0}: total records read ={1}'.format(year, recs_in))
             total_recs_in += recs_in
 
-    print 'Done: total records read ={0}, total records written={1}'.format(total_recs_in, total_recs_out)
+    print('Done: total records read ={0}, total records written={1}'.format(total_recs_in, total_recs_out))
 
 # -----------------------------------
 # - Combine 2 carrier files into 1, dropping the headers beneficiary files into 1, dropping th eheaders
@@ -53,9 +53,9 @@ def combine_beneficiary_files(sample_directory, sample_number, output_bene_filen
 # -----------------------------------
 def combine_carrier_files(sample_directory, sample_number, output_carrier_filename):
 
-    print '-'*80
-    print 'combine_carrier_files starting: sample_number=' + str(sample_number)
-    print 'Writing to ->' + output_carrier_filename
+    print('-'*80)
+    print('combine_carrier_files starting: sample_number=' + str(sample_number))
+    print('Writing to ->' + output_carrier_filename)
 
     total_recs_in = 0
     total_recs_out = 0
@@ -64,14 +64,14 @@ def combine_carrier_files(sample_directory, sample_number, output_carrier_filena
         for part in ['A','B']:
             input_carrier_filename = os.path.join(sample_directory,
                                                'DE1_0_2008_to_2010_Carrier_Claims_Sample_{1}{0}.csv'.format(part, sample_number))
-            print 'Reading    ->' + input_carrier_filename
+            print('Reading    ->' + input_carrier_filename)
             if not os.path.exists(input_carrier_filename):
-                print '.....not found, looking for zip'
+                print('.....not found, looking for zip')
                 zipped_file = input_carrier_filename.replace('.csv','.zip')
                 if os.path.exists(zipped_file):
                     subprocess.call(["unzip", "-d", sample_directory, zipped_file])
                 if not os.path.exists(input_carrier_filename):
-                    print '** File not found !! ', input_carrier_filename
+                    print('** File not found !! ', input_carrier_filename)
                     raise Exception()
             recs_in = 0
             with open(input_carrier_filename, 'r') as f_in:
@@ -81,13 +81,13 @@ def combine_carrier_files(sample_directory, sample_number, output_carrier_filena
                 for line in f_in:
                     recs_in += 1
                     if recs_in % 25000 == 0:
-                        print 'Part-{0}: records read ={1}, total written={2}'.format(part, recs_in, total_recs_out)
+                        print('Part-{0}: records read ={1}, total written={2}'.format(part, recs_in, total_recs_out))
                     f_out.write(line)
                     total_recs_out += 1
-            print 'Part-{0}: total records read ={1}'.format(part, recs_in)
+            print('Part-{0}: total records read ={1}'.format(part, recs_in))
             total_recs_in += recs_in
 
-    print 'Done: total records read ={0}, total records written={1}'.format(total_recs_in, total_recs_out)
+    print('Done: total records read ={0}, total records written={1}'.format(total_recs_in, total_recs_out))
 
 class FileDescriptor(object):
     def __init__(self, token, mode, directory_name, filename, sample_number, verify_exists=False, sort_required=False):
@@ -101,12 +101,13 @@ class FileDescriptor(object):
         self.fd = None
         self._at_eof = False
         self._records_read = 0
+        self._lookahead = None ##  added a new instance variable in __init__
         self._records_written = 0
 
-        print '--FileDescriptor--'
-        print '...token                 =', token
-        print '...mode                  =', mode
-        print '...complete_pathname     =', self.complete_pathname
+        print('--FileDescriptor--')
+        print('...token                 =', token)
+        print('...mode                  =', mode)
+        print('...complete_pathname     =', self.complete_pathname)
 
         ## TODO:
         # should be able to handle:
@@ -121,7 +122,7 @@ class FileDescriptor(object):
             #    files = [ self.complete_pathname.replace('.csv', 'A.csv'),
             #              self.complete_pathname.replace('.csv', 'B.csv')]
             for f in files:
-                print '.....verifying ->', f
+                print('.....verifying ->', f)
                 if not os.path.exists(f):
                     # handle beneficiary
                     if self.token == SYNPUF_FILE_TOKENS.BENEFICARY:
@@ -130,18 +131,18 @@ class FileDescriptor(object):
                         combine_carrier_files(directory_name, sample_number, output_carrier_filename=f)
                     else:
                         #  unzip it if it's there
-                        print '.....not found, looking for zip'
+                        print('.....not found, looking for zip')
                         zipped_file = f.replace('.csv','.zip')
                         if os.path.exists(zipped_file):
                             subprocess.call(["unzip", "-d", directory_name, zipped_file])
                         if not os.path.exists(f):
-                            print '** File not found !! ', f
+                            print('** File not found !! ', f)
                             raise Exception()
 
         if sort_required:
-            print '** Sorted file required'
+            print('** Sorted file required')
             sorted_path = self.complete_pathname + '.srt'
-            print '.....verifying ->', sorted_path
+            print('.....verifying ->', sorted_path)
             if not os.path.exists(sorted_path):
                 zargs = []
                 if self.token == SYNPUF_FILE_TOKENS.BENEFICARY:  #Sort on second field
@@ -193,7 +194,7 @@ class FileDescriptor(object):
         skip_count = 0
 
         if self.fd is None:
-            self.fd = open(self.complete_pathname,'rU')
+            self.fd = open(self.complete_pathname,'r')  ## File mode change
             # 2016-05-26 Skip header which is now at the top of every sorted file
             rec = self.fd.readline()
 
@@ -201,13 +202,17 @@ class FileDescriptor(object):
         recs_in = 0
         while True:
             try:
-                rec = self.fd.readline()
+                if self._lookahead is not None:   ## replaced the seek() logic
+                    rec = self._lookahead
+                    self._lookahead = None
+                else:
+                    rec = self.fd.readline()
                 if rec in [None, '']:
                     self._at_eof = True
                     break
                 recs_in += 1
                 if recs_in % 1000 == 0:
-                    print 'get_patient_records for ',DESYNPUF_ID, ', recs_in=', recs_in, ', file: ', self.complete_pathname
+                    print('get_patient_records for ',DESYNPUF_ID, ', recs_in=', recs_in, ', file: ', self.complete_pathname)
                 if recs_in > 10000 :
                     raise
 
@@ -219,15 +224,18 @@ class FileDescriptor(object):
                     skip_count += 1
                 else:
                     # print '\t ** break; backup'
-                    self.fd.seek(-len(rec),1)
+                    # Python 3 text-mode files don't support relative seeks, so
+                    # buffer this line in memory and hand it back on the next call
+                    # instead of seeking backward like the original Python 2 code did.
+                    self._lookahead = rec
                     # /done = True
                     break
 
             except IOError as ex:
-                print '*** IO Error on file ', self.complete_pathname
-                print ex
-                print 'Record number :', self._records_read + len(record_list) - 1, ' recs_in=', recs_in
-                print '*** IO error \n..current record=', rec
+                print('*** IO Error on file ', self.complete_pathname)
+                print(ex)
+                print('Record number :', self._records_read + len(record_list) - 1, ' recs_in=', recs_in)
+                print('*** IO error \n..current record=', rec)
                 raise BaseException
                 done = True
 
@@ -244,7 +252,7 @@ class FileDescriptor(object):
 
     def write(self, record):
         if self.mode == 'read':
-            print '** Attempt to write to read-only file'
+            print('** Attempt to write to read-only file')
             raise Exception()
         if self.fd is None:
             open_mode = 'a'
@@ -283,11 +291,11 @@ class FileControl(object):
 
         sample_input_directory = os.path.join(base_synpuf_input_directory, synpuf_dir_format.format(sample_number))
 
-        print 'FileControl starting....'
-        print '...base_synpuf_input_directory     = ', base_synpuf_input_directory
-        print '...sample_number                   = ', sample_number
-        print '...sample_input_directory          = ', sample_input_directory
-        print '...base_output_directory           = ', base_output_directory
+        print('FileControl starting....')
+        print('...base_synpuf_input_directory     = ', base_synpuf_input_directory)
+        print('...sample_number                   = ', sample_number)
+        print('...sample_input_directory          = ', sample_input_directory)
+        print('...base_output_directory           = ', base_output_directory)
 
         self.files = {}
 
@@ -337,10 +345,10 @@ class FileControl(object):
                                                sort_required=False)
 
 
-        print 'FileControl files:'
-        print '-'*30
+        print('FileControl files:')
+        print('-'*30)
         for ix, filedesc in enumerate(self.files):
-            print '[{0}] {1}'.format(ix, self.files[filedesc])
+            print('[{0}] {1}'.format(ix, self.files[filedesc]))
 
     def descriptor_list(self, which='all'):
         # someday I'll learn list comprehension
