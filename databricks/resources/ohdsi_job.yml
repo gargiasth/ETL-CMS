@@ -1,0 +1,41 @@
+# OHDSI SynPUF Pipeline
+#
+# Orchestrates the end-to-end flow from raw CMS SynPUF data → OMOP CDM tables.
+# Tasks will be added incrementally as their implementations solidify.
+
+resources:
+  jobs:
+    ohdsi_pipeline:
+      name: "OHDSI SynPUF Pipeline"
+      description: >
+        Downloads SynPUF samples, loads OMOP Vocabulary, runs the OHDSI
+        Python ETL, and loads the resulting OMOP CSVs into the OMOP CDM
+        tables. Built on top of the upstream OHDSI ETL-CMS codebase.
+
+      # Serverless environment shared by all tasks
+      environments:
+        - environment_key: default_env
+          spec:
+            client: "3"
+            dependencies:
+              - sqlglot
+
+      tasks:
+        - task_key: download_synpuf_raw
+          environment_key: default_env
+          spark_python_task:
+            python_file: ../../scripts/get_synpuf_files.py
+            parameters:
+              - /Volumes/etl_cms/ohdsi_raw/synpuf
+              - "all"
+
+
+        - task_key: create_omop_tables
+          description: Create the 39 OMOP CDM v5 tables in the target schema
+          environment_key: default_env
+          spark_python_task:
+            python_file: ../../scripts/create_CDMv5_tables.py
+            parameters:
+              - "${var.catalog}"
+              - "${var.schema}"
+              - "${workspace.file_path}/SQL/create_CDMv5_tables.sql"
