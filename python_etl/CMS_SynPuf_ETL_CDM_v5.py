@@ -11,6 +11,8 @@ from FileControl import FileControl
 from SynPufFiles import PrescriptionDrug, InpatientClaim, OutpatientClaim, CarrierClaim
 from datetime import date
 import calendar
+
+print("check123")
 # ------------------------
 # TODO: polish for updating to OHDSI (doc strings, testing, comments, pylint, etc)
 #
@@ -86,7 +88,7 @@ import calendar
 #  2016-06-17  Christophe Lambert, Praveen Kumar, Amritansh -- University of New Mexico -- Major overhaul
 # ------------------------
 
-dotenv.load_dotenv(".env")
+dotenv.load_dotenv("/Volumes/etl_cms/ohdsi_raw/config/.env")
 
 # -----------------------------------
 # - Configuration
@@ -240,7 +242,7 @@ def get_timestamp():
 def log_stats(msg):
     print(msg)
     global current_stats_filename
-    with open(current_stats_filename,'a') as fout:
+    with open(current_stats_filename,'w') as fout:
         fout.write('[{0}]{1}\n'.format(get_timestamp(),msg))
 
 # -----------------------------------
@@ -480,6 +482,8 @@ def build_maps():
                         else:
                             source_code_concept_dict[vocabulary_id,concept_code] = []
                             for concept in concept_relationship_dict[concept_id]:
+                                if concept not in domain_dict:
+                                    continue
                                 if  not (domain_dict[concept] in domain_destination_file_list):
                                     status = "No destination defined for domain " + domain_dict[concept] + " of concept " + concept_id
                                 else:
@@ -2114,3 +2118,15 @@ if __name__ == '__main__':
 
 
     print('** done **')
+
+    # Copy output files from /tmp to Volume for persistence
+    import shutil
+    final_output = "/Volumes/etl_cms/ohdsi_raw/omop_output"
+    os.makedirs(final_output, exist_ok=True)
+    print(f"Copying output files from {BASE_OUTPUT_DIRECTORY} to {final_output}")
+    for f in os.listdir(BASE_OUTPUT_DIRECTORY):
+        src = os.path.join(BASE_OUTPUT_DIRECTORY, f)
+        dst = os.path.join(final_output, f)
+        shutil.copy2(src, dst)
+        print(f"  Copied {f}")
+    print("Done copying output files")
