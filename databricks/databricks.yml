@@ -31,7 +31,8 @@ variables:
     description: Volume path containing raw SynPUF CSVs
   omop_output_volume_path:
     description: Volume path where the Python ETL will write OMOP CSVs
-
+  etl_control_volume_path:
+    description: Volume path where the ETL writes cross-sample state files
 targets:
   dev:
     mode: development
@@ -44,6 +45,7 @@ targets:
       vocab_volume_path: /Volumes/etl_cms/ohdsi_raw/vocabulary
       synpuf_volume_path: /Volumes/etl_cms/ohdsi_raw/synpuf
       omop_output_volume_path: /Volumes/etl_cms/ohdsi_raw/omop_output
+      etl_control_volume_path: /Volumes/etl_cms/ohdsi_raw/etl_control
 
   # prod:
   #   mode: production

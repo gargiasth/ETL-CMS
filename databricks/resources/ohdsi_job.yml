@@ -17,8 +17,7 @@ resources:
         - environment_key: default_env
           spec:
             client: "3"
-            dependencies:
-              - sqlglot
+            dependencies: ["sqlglot", "python-dotenv"]
 
       tasks:
         - task_key: download_synpuf_raw
@@ -26,7 +25,7 @@ resources:
           spark_python_task:
             python_file: ../../scripts/get_synpuf_files.py
             parameters:
-              - /Volumes/etl_cms/ohdsi_raw/synpuf
+              - "${var.synpuf_volume_path}"
               - "all"
 
 
@@ -39,3 +38,15 @@ resources:
               - "${var.catalog}"
               - "${var.schema}"
               - "${workspace.file_path}/SQL/create_CDMv5_tables.sql"
+
+
+        - task_key: run_python_etl
+          description: Transform raw SynPUF into OMOP CDM format
+          depends_on:
+            - task_key: create_omop_tables
+            - task_key: download_synpuf_raw
+          environment_key: default_env
+          spark_python_task:
+            python_file: ../../python_etl/CMS_SynPuf_ETL_CDM_v5.py
+            parameters:
+              - "1"     
