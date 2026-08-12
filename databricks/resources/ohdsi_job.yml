@@ -50,3 +50,16 @@ resources:
             python_file: ../../python_etl/CMS_SynPuf_ETL_CDM_v5.py
             parameters:
               - "1"     
+
+        - task_key: load_omop_output
+          description: Load ETL output CSVs into OMOP CDM tables
+          depends_on:
+            - task_key: run_python_etl
+          environment_key: default_env
+          spark_python_task:
+            python_file: ../../scripts/load_omop_output.py
+            parameters:
+              - "${var.catalog}"                    # 1
+              - "${var.schema}"                     # 2
+              - "${var.omop_output_volume_path}"    # 3
+              - "1"   

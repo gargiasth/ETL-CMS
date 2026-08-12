@@ -8,10 +8,12 @@ one per parsed statement.
 Uses sqlglot for parsing and generation. Handles specific dialect gaps
 that sqlglot's default translation doesn't cover:
   - Standalone NULL constraints on columns
+  - psql client command prefixes (\COPY → COPY, etc.)
 
 No Databricks or Spark dependency — pure Python. Can be used offline,
 in tests, or in any environment that runs Python.
 """
+import re
 from typing import List, Optional
 
 import sqlglot
@@ -28,6 +30,7 @@ def translate_postgres_to_databricks(postgres_sql: str) -> List[str]:
         List of Databricks-dialect SQL statements. One per parseable
         statement in the input. Sqlglot parse failures are excluded.
     """
+    postgres_sql = _strip_psql_client_prefixes(postgres_sql)
     trees = sqlglot.parse(postgres_sql, read="postgres")
     statements = []
     for tree in trees:
@@ -49,6 +52,32 @@ def _remove_standalone_null_constraints(tree: exp.Expression) -> None:
         if constraint.args.get("allow_null"):
             constraint.pop()
 
+
+def _strip_psql_client_prefixes(sql: str) -> str:
+    r"""Strip psql client-command backslash prefixes.
+
+    psql prefixes client-side commands with a backslash. Most have standard
+    SQL equivalents once the prefix is stripped (\COPY → COPY). Some have
+    no Databricks equivalent — those go in REMOVE and their lines are
+    dropped entirely so sqlglot never sees them.
+    """
+    # Commands whose lines should be DROPPED entirely (no Databricks equivalent).
+    REMOVE = {"cd"}
+
+    # First pass: drop lines beginning with a REMOVE-listed command
+    kept_lines = []
+    for line in sql.split("\n"):
+        stripped = line.strip()
+        if stripped.startswith("\\"):
+            match = re.match(r"\\([A-Za-z]+)", stripped)
+            if match and match.group(1).lower() in REMOVE:
+                continue  # skip line entirely
+        kept_lines.append(line)
+    
+    cleaned = "\n".join(kept_lines)
+
+    # Second pass: strip backslash from remaining commands (\COPY → COPY)
+    return re.sub(r"\\([A-Za-z]+)\b", r"\1", cleaned)
 
 def append_using_delta(statement: str) -> str:
     """Append USING DELTA to CREATE TABLE statements."""
