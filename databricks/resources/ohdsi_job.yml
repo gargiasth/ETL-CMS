@@ -23,7 +23,7 @@ resources:
         - task_key: download_synpuf_raw
           environment_key: default_env
           spark_python_task:
-            python_file: ../../scripts/get_synpuf_files.py
+            python_file: ../ingestion/get_synpuf_files.py
             parameters:
               - "${var.synpuf_volume_path}"
               - "all"
@@ -33,7 +33,7 @@ resources:
           description: Create the 39 OMOP CDM v5 tables in the target schema
           environment_key: default_env
           spark_python_task:
-            python_file: ../../scripts/create_CDMv5_tables.py
+            python_file: ../ingestion/create_CDMv5_tables.py
             parameters:
               - "${var.catalog}"
               - "${var.schema}"
