@@ -15,7 +15,7 @@
 # limitations under the License.
 ********************************************************************************/
 -- Change to the directory containing the data files
-\cd :data_dir
+-- \cd :data_dir
 
 -- Run the following command:
 -- psql 'dbname={ohdsi} user={username} options=--search_path={schema_name}' -f load_CDMv5_synpuf.sql -v data_dir={dir_goes_here}

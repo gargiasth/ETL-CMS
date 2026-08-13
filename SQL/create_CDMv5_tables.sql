@@ -687,8 +687,8 @@ CREATE TABLE IF NOT EXISTS drug_era
     )
 ;
 
-create sequence drug_era_sequence;
-alter table drug_era alter drug_era_id set default nextval('drug_era_sequence');
+-- create sequence drug_era_sequence;
+-- alter table drug_era alter drug_era_id set default nextval('drug_era_sequence');
 
 
 CREATE TABLE IF NOT EXISTS dose_era
@@ -717,5 +717,5 @@ CREATE TABLE IF NOT EXISTS condition_era
     )
 ;
 
-create sequence condition_era_sequence;
-alter table condition_era alter condition_era_id set default nextval('condition_era_sequence');
+-- create sequence condition_era_sequence;
+-- alter table condition_era alter condition_era_id set default nextval('condition_era_sequence');
