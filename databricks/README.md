@@ -7,22 +7,22 @@ If you have a working Python ETL sitting on GitHub and want to run it on Databri
 
 ## Template structure
 
-\`\`\`
+```
 your-project/
-├── databricks/              # Bundle configuration
-│   ├── databricks.yml       # Workspace, catalog, schema, Volume paths
+├── databricks/                       # Bundle configuration
+│   ├── databricks.yml                # Workspace, catalog, schema, Volume paths
 │   └── resources/
-│       └── job.yml          # Pipeline task definitions
-├── scripts/                 # Thin task wrappers (one per pipeline task)
-├── utils/                   # Reusable helpers
-│   ├── sql_translation.py       # Dialect translation (Traditional SQL → Databricks compatible SQL)
-│   ├── execute_sql_file.py      # SQL execution against Spark
-│   └── validate_output_schema.py # Table schema introspection
-├── SQL/                     # Source SQL files (Postgres dialect)
-├── python_etl/              # Your legacy Python ETL code
-├── requirements.txt         # Runtime dependencies
+│       └── job.yml                   # Pipeline task definitions
+├── scripts/                          # Thin task wrappers (one per pipeline task)
+├── utils/                            # Reusable helpers
+│   ├── sql_translation.py            # Dialect translation (Postgres → Databricks SQL)
+│   ├── execute_sql_file.py           # SQL execution against Spark
+│   └── validate_output_schema.py     # Table schema introspection
+├── SQL/                              # Source SQL files (Postgres dialect)
+├── python_etl/                       # Your legacy Python ETL code
+├── requirements.txt                  # Runtime dependencies
 └── README.md
-\`\`\`
+```
 
 The idea: think of your pipeline as sequential stages, each in its own folder. Keep your legacy code isolated in one stage. Add Databricks-specific glue elsewhere.
 
