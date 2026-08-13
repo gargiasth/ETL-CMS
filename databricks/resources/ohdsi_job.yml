@@ -23,7 +23,7 @@ resources:
         - task_key: download_synpuf_raw
           environment_key: default_env
           spark_python_task:
-            python_file: ../ingestion/get_synpuf_files.py
+            python_file: ../../scripts/get_synpuf_files.py
             parameters:
               - "${var.synpuf_volume_path}"
               - "all"
@@ -57,7 +57,7 @@ resources:
             - task_key: run_python_etl
           environment_key: default_env
           spark_python_task:
-            python_file: ../../scripts/load_omop_output.py
+            python_file: ../ingestion/load_omop_output.py
             parameters:
               - "${var.catalog}"                    # 1
               - "${var.schema}"                     # 2
