@@ -46,6 +46,5 @@ develop-eggs/
 # Installer logs
 pip-log.txt
 
-# Environment variables
+# Environment Variables
 .env
-
