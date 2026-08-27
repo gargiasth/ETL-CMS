@@ -12,7 +12,6 @@ from SynPufFiles import PrescriptionDrug, InpatientClaim, OutpatientClaim, Carri
 from datetime import date
 import calendar
 
-print("check123")
 # ------------------------
 # TODO: polish for updating to OHDSI (doc strings, testing, comments, pylint, etc)
 #
@@ -88,7 +87,6 @@ print("check123")
 #  2016-06-17  Christophe Lambert, Praveen Kumar, Amritansh -- University of New Mexico -- Major overhaul
 # ------------------------
 
-dotenv.load_dotenv("/Volumes/etl_cms/ohdsi_raw/config/.env")
 
 # -----------------------------------
 # - Configuration
@@ -97,7 +95,7 @@ dotenv.load_dotenv("/Volumes/etl_cms/ohdsi_raw/config/.env")
 
 # Edit your .env file to change which directories to use in the ETL process
 
-# Path to the directory where control files should be saved (input/output
+# Path to the directory where control files should be saved (input/output)
 BASE_ETL_CONTROL_DIRECTORY      = os.environ['BASE_ETL_CONTROL_DIRECTORY']
 
 # Path to the directory containing the downloaded SynPUF files
@@ -426,7 +424,7 @@ def build_maps():
 
     #First pass to obtain domain ids of concepts
     domain_dict = {}
-    with open(omop_concept_file,'r') as fin:
+    with open(omop_concept_file,'r', encoding='utf-8') as fin:
         fin.readline()
         for rec in fin:
             flds = (rec[:-1]).split('\t')
@@ -436,7 +434,7 @@ def build_maps():
                 domain_dict[concept_id] = domain_id
     print("loaded domain dict with this many records: ", len(domain_dict))
 
-    with open(omop_concept_file,'r') as fin, \
+    with open(omop_concept_file,'r', encoding='utf-8') as fin, \
          open(omop_concept_debug_file, 'w') as fout_log:
          # open(omop_concept_file_mini, 'w') as fout_mini:
         fin.readline() #skip header
@@ -2118,15 +2116,3 @@ if __name__ == '__main__':
 
 
     print('** done **')
-
-    # Copy output files from /tmp to Volume for persistence
-    import shutil
-    final_output = "/Volumes/etl_cms/ohdsi_raw/omop_output"
-    os.makedirs(final_output, exist_ok=True)
-    print(f"Copying output files from {BASE_OUTPUT_DIRECTORY} to {final_output}")
-    for f in os.listdir(BASE_OUTPUT_DIRECTORY):
-        src = os.path.join(BASE_OUTPUT_DIRECTORY, f)
-        dst = os.path.join(final_output, f)
-        shutil.copy2(src, dst)
-        print(f"  Copied {f}")
-    print("Done copying output files")

@@ -7,15 +7,15 @@ call repeatedly without duplicating work.
 import os
 import io
 
-def upload_directory_to_stage(session, schema: str, stage: str, local_dir: str) -> int:
+def upload_directory_to_stage(session, schema: str, stage: str, local_dir: str, prefix: str = "") -> int:
     count = 0
     for root, dirs, files in os.walk(local_dir):
         for filename in files:
             local_path = os.path.join(root, filename)
             with open(local_path, "rb") as f:
                 data = f.read()
-            print(f"Uploading {local_path} ...")
-            upload_bytes_to_stage(session, schema, stage, filename, data)
+            stage_path = f"{prefix}/{filename}" if prefix else filename
+            upload_bytes_to_stage(session, schema, stage, stage_path, data)
             count += 1
     return count
 
