@@ -408,7 +408,7 @@ CREATE TABLE IF NOT EXISTS condition_occurrence
 
 
 
-CREATE TABLE IF NOT EXISTS measurement
+CREATE TABLE IF NOT EXISTS measurement_occurrence
     (
      measurement_id					INTEGER			NOT NULL ,
      person_id						INTEGER			NOT NULL ,
