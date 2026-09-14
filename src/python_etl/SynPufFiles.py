@@ -1,4 +1,4 @@
-from constants import PRESCRIPTION_DRUG_RECORD, INPATIENT_CLAIMS_RECORD, OUTPATIENT_CLAIMS_RECORD, CARRIER_CLAIMS_RECORD
+from src.python_etl.constants import PRESCRIPTION_DRUG_RECORD, INPATIENT_CLAIMS_RECORD, OUTPATIENT_CLAIMS_RECORD, CARRIER_CLAIMS_RECORD
 
 #-=================================
 #-=================================
