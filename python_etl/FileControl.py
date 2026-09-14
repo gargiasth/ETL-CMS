@@ -144,34 +144,24 @@ class FileDescriptor(object):
             sorted_path = self.complete_pathname + '.srt'
             print('.....verifying ->', sorted_path)
             if not os.path.exists(sorted_path):
-                zargs = []
-                if self.token == SYNPUF_FILE_TOKENS.BENEFICARY:  #Sort on second field
-                    fin = open(self.complete_pathname,"r")
+                # Split header from body so `sort` only touches data rows.
+                body_path = self.complete_pathname + '.nohdr'
+                with open(self.complete_pathname, 'r') as fin, open(body_path, 'w') as fout_body:
                     firstline = fin.readline()
-                    textfile = []
                     for line in fin:
-                        v = line.split(",")
-                        textfile.append([v[1],line])
-                    fin.close()
-                    textfile.sort()
-                    fout = open(sorted_path,"w")
+                        fout_body.write(line)
+
+                with open(sorted_path, 'w') as fout:
                     fout.write(firstline)
-                    for (key,line) in textfile:
-                        fout.write(line)
-                    fout.close()
-                else:
-                    fin = open(self.complete_pathname,"r")
-                    firstline = fin.readline()
-                    textfile = []
-                    for line in fin:
-                        textfile.append(line)
-                    fin.close()
-                    textfile.sort()
-                    fout = open(sorted_path,"w")
-                    fout.write(firstline)
-                    for line in textfile:
-                        fout.write(line)
-                    fout.close()
+                    if self.token == SYNPUF_FILE_TOKENS.BENEFICARY:
+                        # Original sorted by the 2nd field specifically
+                        subprocess.run(['sort', '-t,', '-k2,2', body_path], stdout=fout, check=True)
+                    else:
+                        # Original sorted by the full line — plain `sort` with
+                        # no -k flag does exactly this, same as before
+                        subprocess.run(['sort', body_path], stdout=fout, check=True)
+
+                os.remove(body_path)
 
             self.complete_pathname = sorted_path
 
