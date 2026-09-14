@@ -48,3 +48,8 @@ pip-log.txt
 
 # Environment Variables
 .env
+
+
+# data outputs
+data_output
+OMOP_Vocabulary
