@@ -12,7 +12,7 @@ sys.path.insert(0, _snowflake_root)
 from utils_snowflake.connection import get_connection
 from spcs.utils_snowflake.execute_sql_file import run_sql_file
 
-SQL_PATH = os.path.join(_snowflake_root, "..", "SQL", "create_CDMv5_tables.sql")
+SQL_PATH = os.path.join(_snowflake_root, "..","src", "SQL", "create_CDMv5_tables.sql")
 
 
 if __name__ == "__main__":
